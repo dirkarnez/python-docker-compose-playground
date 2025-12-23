@@ -16,10 +16,14 @@
 #     tini \
 #     tzdata
 
-FROM ubuntu:latest
+FROM python:3.11-trixie
 
 ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get upgrade
+
 RUN apt-get update
+
 RUN apt-get -y --no-install-recommends --allow-unauthenticated install \
    build-essential \
    git \
@@ -31,20 +35,33 @@ RUN apt-get -y --no-install-recommends --allow-unauthenticated install \
    ca-certificates \
    make \
    bash \
-   bc
+   bc \
+   libxml2 \
+   libxslt-dev \
+   wget \
+   bzip2
 
-# Create a custom user with UID 1234 and GID 1234
-RUN groupadd -g 1234 customgroup && \
-    useradd -m -u 1234 -g customgroup customuser
+# # Create a custom user with UID 1234 and GID 1234
+# RUN groupadd -g 1234 customgroup && \
+#     useradd -m -u 1234 -g customgroup customuser
     
-# Switch to the custom user
-USER customuser
+# # Switch to the custom user
+# USER customuser
  
-RUN mkdir /workspace
-COPY . /workspace
+# RUN mkdir /workspace
+# COPY . /workspace
 
-WORKDIR /workspace
-VOLUME /workspace
+# WORKDIR /workspace
+# VOLUME /workspace
+
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN pip install --upgrade pip
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Print the UID and GID
 CMD echo 'Inside Container:' && \
